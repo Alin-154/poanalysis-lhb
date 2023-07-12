@@ -10,7 +10,7 @@
 @Desc    :   None
 '''
 import os
-import configparser
+import argparse
 from tqdm import tqdm
 import jsonlines
 
@@ -27,11 +27,6 @@ def write_jsonlines(data, path):
     with jsonlines.open(path, "w") as f:
         for i in tqdm(data):
             f.write(i)
-
-
-def read_ini():
-    config = configparser.ConfigParser()
-    return config.read(os.environ.get("CONFIG_PATH"))
 
 
 def split_paragraph_into_many(paragraph: str,  max_length=512):
@@ -96,3 +91,14 @@ def split_text_into_many(text: str, min_length=1, max_length = 512, max_paragrap
     if batch_length:
         chunks.append("".join(batch))
     return chunks
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="舆情分析")
+    parser.add_argument("--host", type=str, required=False, default="0.0.0.0")
+    parser.add_argument("--port", type=int, required=False, default=6666)
+    parser.add_argument("--model_name_or_path", type=str, required=True)
+    parser.add_argument("--ptuning_checkpoint", type=str, required=True)
+    parser.add_argument("--pre_seq_len", type=int, required=True)
+    args = parser.parse_args()
+    return args
