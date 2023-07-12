@@ -29,7 +29,7 @@ if __name__ == "__main__":
     config = parse_args()
     print(config)
 
-    # model = PoPredictor(config["model_name_or_path"], \
-    #                 config["ptuning_checkpoint"], \
-    #                 config["pre_seq_len"])
+    model = PoPredictor(config.model_name_or_path, \
+                    config.ptuning_checkpoint, \
+                    config.pre_seq_len)
     app.run(host=config.host, port=config.port)
