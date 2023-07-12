@@ -78,13 +78,6 @@ class PoPredictor(Predictor):
             responses.append(label)
         return responses
 
-    def _post_process(self, text: str):
-        text = text.strip()
-        text = text.replace("nan", "").replace("\n\n", "\n")
-        text = text.replace("；", ";").replace("_x000D_", "")
-        text = text.replace("（", "(").replace("）", ")")
-        return text
-
     def _get_label_pairs(self, text):
         if not text or "-" not in text:
             return []
@@ -98,10 +91,18 @@ class PoPredictor(Predictor):
                 labels.append(label + "-" + word)
         return labels
 
+    def _post_process(self, text: str):
+        text = text.strip()
+        text = text.replace("nan", "").replace("\n\n", "\n")
+        text = text.replace("；", ";").replace("_x000D_", "")
+        text = text.replace("（", "(").replace("）", ")")
+        text = self._get_label_pairs(text)
+        return text
+
     def response_output_wrapper(self, text, responses: List[Dict[str, str]]) -> Dict:
         labels = []
         for resp in responses:
-            labels.extend(self._get_label_pairs(resp["label"]))
+            labels.extend(resp["label"])
         
         labels = list(set(labels))
         
@@ -116,7 +117,7 @@ class PoPredictor(Predictor):
         paragraphing = kwargs["paragraphing"]
         texts = self._pre_process(text, paragraphing)
         responses = self._predict(texts, task=task)
-        responses = [{"text": text, "label": self.post_process(response)} for text, response in zip(texts, responses)]
+        responses = [{"text": text, "label": self._post_process(response)} for text, response in zip(texts, responses)]
         response = self.response_output_wrapper(text, responses)
         return response
     
