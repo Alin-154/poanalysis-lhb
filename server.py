@@ -20,7 +20,9 @@ app = Flask(__name__)
 @app.route("/predict", methods=["post"])
 def predict():
     req = request.json
-    resp = model.predict(req["text"], task="ee", paragraphing=req.get("paragraphing", True))
+    resp = model.predict(req["text"], task="ee", \
+                        paragraphing=req.get("paragraphing", True), \
+                        require_doccano_label=req.get("require_doccano_label", False))
     return jsonify(resp)
 
 

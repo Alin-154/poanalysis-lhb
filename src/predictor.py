@@ -14,7 +14,7 @@ import re
 from typing import List, Dict
 import torch
 from transformers import AutoConfig, AutoModel, AutoTokenizer
-from .utils import split_paragraph_into_many
+from .utils import split_paragraph_into_many, build_doccano_label
 
 
 class Predictor(object):
@@ -99,25 +99,30 @@ class PoPredictor(Predictor):
         text = self._get_label_pairs(text)
         return text
 
-    def response_output_wrapper(self, text, responses: List[Dict[str, str]]) -> Dict:
+    def response_output_wrapper(self, text, responses: List[Dict[str, str]], require_doccano_label) -> Dict:
         labels = []
-        for resp in responses:
-            labels.extend(resp["label"])
-        
+        paragraphs = []
+        for item in responses:
+            labels.extend(item["labels"])
+            if require_doccano_label:
+                item["doccano_label"] = build_doccano_label(item["text"], item["labels"])
+            paragraphs.append(item)
+                
         labels = list(set(labels))
         
         response = {
                 "text": text,
                 "labels": labels,
-                "paragraphs": responses
+                "paragraphs": paragraphs
             }
         return response
 
     def predict(self, text, task="ee", **kwargs) -> Dict:
         paragraphing = kwargs["paragraphing"]
+        require_doccano_label = kwargs["require_doccano_label"]
         texts = self._pre_process(text, paragraphing)
         responses = self._predict(texts, task=task)
-        responses = [{"text": text, "label": self._post_process(response)} for text, response in zip(texts, responses)]
-        response = self.response_output_wrapper(text, responses)
+        responses = [{"text": text, "labels": self._post_process(response)} for text, response in zip(texts, responses)]
+        response = self.response_output_wrapper(text, responses, require_doccano_label)
         return response
     

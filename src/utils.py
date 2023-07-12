@@ -102,3 +102,21 @@ def parse_args():
     parser.add_argument("--pre_seq_len", type=int, required=True)
     args = parser.parse_args()
     return args
+
+
+def get_word_idx(text, entity):
+    start_idx = text.index(entity)
+    end_idx = start_idx + len(entity)
+    return start_idx, end_idx
+
+
+def build_doccano_label(text, labels):
+    res = []
+    for item in labels:
+        try:
+            label, entity = item.split("-")
+            index = get_word_idx(text, entity)
+        except:
+            continue
+        res.append([index[0], index[1], label])
+    return res
