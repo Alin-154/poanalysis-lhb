@@ -96,7 +96,7 @@ def split_text_into_many(text: str, min_length=1, max_length = 512, max_paragrap
 def parse_args():
     parser = argparse.ArgumentParser(description="舆情分析")
     parser.add_argument("--host", type=str, required=False, default="0.0.0.0")
-    parser.add_argument("--port", type=int, required=False, default=6666)
+    parser.add_argument("--port", type=int, required=False, default=6006)
     parser.add_argument("--model_name_or_path", type=str, required=True)
     parser.add_argument("--ptuning_checkpoint", type=str, required=True)
     parser.add_argument("--pre_seq_len", type=int, required=True)
