@@ -68,11 +68,12 @@ def split_text_into_many(text: str, min_length=1, max_length = 512, max_paragrap
     chunks, chunks_num = [], 0
     batch, batch_length = [], 0
     for paragraph in paragraphs:
+        paragraph = paragraph.strip().replace('\xa0', '')
+        paragraph = paragraph.replace("\u2003", "")
         if chunks_num >= max_paragraphs:
             chunks.append("".join(batch))
             batch, batch_length = [], 0
         else:
-            paragraph = paragraph.strip().replace('\xa0', '')
             paragraph_length = len(paragraph)
             # paragraph_length+ batch_length <= max_length
             if (paragraph_length + batch_length) <= max_length:
