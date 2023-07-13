@@ -33,5 +33,6 @@ if __name__ == "__main__":
 
     model = PoPredictor(config.model_name_or_path, \
                     config.ptuning_checkpoint, \
-                    config.pre_seq_len)
+                    config.pre_seq_len,
+                    config.quantize)
     app.run(host=config.host, port=config.port)

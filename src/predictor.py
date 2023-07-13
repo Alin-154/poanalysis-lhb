@@ -18,10 +18,10 @@ from .utils import split_paragraph_into_many, build_doccano_label
 
 
 class Predictor(object):
-    def __init__(self, model_name_or_path: str, ptuning_checkpoint: str = None, pre_seq_len: int = 128) -> None:
-        self._load_model(model_name_or_path, ptuning_checkpoint, pre_seq_len)
+    def __init__(self, model_name_or_path: str, ptuning_checkpoint: str = None, pre_seq_len: int = 128, quantize: bool = False) -> None:
+        self._load_model(model_name_or_path, ptuning_checkpoint, pre_seq_len, quantize)
 
-    def _load_model(self, model_name_or_path, ptuning_checkpoint, pre_seq_len):
+    def _load_model(self, model_name_or_path, ptuning_checkpoint, pre_seq_len, quantize):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
         config = AutoConfig.from_pretrained(model_name_or_path, trust_remote_code=True, pre_seq_len=pre_seq_len)
         model = AutoModel.from_pretrained(model_name_or_path, config=config, trust_remote_code=True)
@@ -31,6 +31,8 @@ class Predictor(object):
             if k.startswith("transformer.prefix_encoder."):
                 new_prefix_state_dict[k[len("transformer.prefix_encoder."):]] = v
         model.transformer.prefix_encoder.load_state_dict(new_prefix_state_dict)
+        if quantize:
+            model = model.quantize(4)
         model = model.half().cuda()
         model.transformer.prefix_encoder.float()
         model = model.eval()
@@ -59,8 +61,8 @@ class Predictor(object):
         
 
 class PoPredictor(Predictor):
-    def __init__(self, model_name_or_path: str, ptuning_checkpoint: str = None, pre_seq_len: int = 128) -> None:
-        super().__init__(model_name_or_path, ptuning_checkpoint, pre_seq_len)
+    def __init__(self, model_name_or_path: str, ptuning_checkpoint: str = None, pre_seq_len: int = 128, quantize: bool = False) -> None:
+        super().__init__(model_name_or_path, ptuning_checkpoint, pre_seq_len, quantize)
         self.regex = re.compile(".*?-")
 
     def _pre_process(self, text: str, paragraphing: bool=False) -> List[str]:

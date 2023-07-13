@@ -100,6 +100,7 @@ def parse_args():
     parser.add_argument("--model_name_or_path", type=str, required=True)
     parser.add_argument("--ptuning_checkpoint", type=str, required=True)
     parser.add_argument("--pre_seq_len", type=int, required=True)
+    parser.add_argument("--quantize", type=bool, required=False, default=False)
     args = parser.parse_args()
     return args
 
