@@ -30,12 +30,13 @@ class ChatGLMDataset(Dataset):
     def collate_fn(self, batch):
         x = []
         y = []
+        max_seq_length = self.max_source_length + self.max_target_length
         for i in batch:
             input, output = i[self.input_column], i[self.output_column]
             a_ids = self.tokenizer.encode(text=input, add_special_tokens=False)
             b_ids = self.tokenizer.encode(text=output, add_special_tokens=False)
             if len(a_ids) > self.max_source_length - 1:
-                a_ids = a_ids[: self..max_source_length - 1]
+                a_ids = a_ids[: self.max_source_length - 1]
 
             if len(b_ids) > self.max_target_length - 2:
                 b_ids = b_ids[: self.max_target_length - 2]
@@ -46,7 +47,7 @@ class ChatGLMDataset(Dataset):
             mask_position = context_length - 1
             labels = [-100] * context_length + input_ids[mask_position+1:]
             
-            pad_len = self.max_seq_length - len(input_ids)
+            pad_len = max_seq_length - len(input_ids)
             input_ids = input_ids + [self.tokenizer.pad_token_id] * pad_len
             labels = labels + [self.tokenizer.pad_token_id] * pad_len
             if self.ignore_pad_token_for_loss:
