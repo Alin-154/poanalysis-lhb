@@ -1,5 +1,5 @@
 MODEL_NAME_OR_PATH=model_dir/chatglm/
-PTUNING_CHECKPOINT=model_dir/checkpoint-2500/
+PTUNING_CHECKPOINT=model_dir/ptuning/
 PRE_SEQ_LEN=64
 QUANTIZE=True
 
