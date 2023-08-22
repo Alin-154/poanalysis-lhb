@@ -17,7 +17,7 @@ from .utils import lora_state_dict
 from .chatglm_lora import PlChatGLM
 
 
-class LoraModelCheckpoint(ModelCheckpoint):
+class LLMModelCheckpoint(ModelCheckpoint):
 
     def _save_checkpoint(self, trainer: 'pl.Trainer', filepath: str) -> None:
         if trainer.model.config.use_lora:
