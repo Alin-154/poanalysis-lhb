@@ -60,7 +60,7 @@ def train(args):
 
 
     # train
-    model_checkpoint = LLMModelCheckpoint(every_n_epochs=1)
+    model_checkpoint = LLMModelCheckpoint(every_n_epochs=1, dirpath=args.dirpath)
     trainer = pl.Trainer(accelerator=args.accelerator, \
                          max_epochs=args.max_epochs, \
                         logger=args.logger, \
@@ -83,6 +83,7 @@ def parse_args():
 
     # model
     parser.add_argument("--model_name_or_path", type=str, required=True)
+    parser.add_argument("--dirpath", type=str, required=False, default="output")
 
     # data & tokenizer
     parser.add_argument("--train_data_path", type=str, required=True)
