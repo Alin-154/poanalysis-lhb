@@ -14,14 +14,18 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from weakref import proxy
 from .utils import lora_state_dict
+from .chatglm_lora import PlChatGLM
 
 
 class LoraModelCheckpoint(ModelCheckpoint):
 
-    def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
-        # trainer.save_checkpoint(filepath, self.save_weights_only)
-        lora_model = lora_state_dict(trainer.model)
-        torch.save(lora_model, filepath)
+    def _save_checkpoint(self, trainer: 'pl.Trainer', filepath: str) -> None:
+        if trainer.model.config.use_lora:
+            bias = trainer.model.config.lora_config.bias
+            lora_model = lora_state_dict(trainer.model, bias)
+            torch.save(lora_model, filepath)
+        else:
+            trainer.save_checkpoint(filepath, self.save_weights_only)
 
         self._last_global_step_saved = trainer.global_step
 
