@@ -14,12 +14,13 @@ import argparse
 from typing import Union, List, Iterable
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import Logger
-from pytorch_lightning.callbacks import ModelCheckpoint
 from torch.utils.data import DataLoader
 from transformers import AutoConfig, AutoTokenizer
 from peft import LoraConfig, TaskType
 from src.chatglm_lora import PlChatGLM
 from src.datasets import ChatGLMDataset
+from src.utils import print_trainable_parameters
+from src.callbacks import LLMModelCheckpoint
 
 def train(args):
     use_lora = args.use_lora
@@ -30,7 +31,7 @@ def train(args):
                 lora_alpha=args.lora_alpha,
                 target_modules=["query_key_value"],
                 lora_dropout=args.lora_dropout,
-                bias="none",
+                bias=args.lora_bias,
                 task_type=TaskType.CAUSAL_LM,
                 inference_mode=False
             )
@@ -55,15 +56,16 @@ def train(args):
     
     # model
     model = PlChatGLM(config)
+    print_trainable_parameters(model)
 
 
     # train
-    model_checkpoint = ModelCheckpoint(every_n_epochs=1)
+    model_checkpoint = LLMModelCheckpoint(every_n_epochs=1)
     trainer = pl.Trainer(accelerator=args.accelerator, \
                          max_epochs=args.max_epochs, \
                         logger=args.logger, \
                         precision=args.precision, \
-                        callbacks==[model_checkpoint])
+                        callbacks=[model_checkpoint])
 
     trainer.fit(model, train_dataloaders=train_dataloader)
 
@@ -93,6 +95,7 @@ def parse_args():
     # lora
     parser.add_argument("--use_lora", type=bool, required=False, default=True)
     parser.add_argument("--r", type=int, required=False, default=8)
+    parser.add_argument("--lora_bias", type=str, required=False, default="none")
     parser.add_argument("--lora_alpha", type=int, required=False, default=32)
     parser.add_argument("--lora_dropout", type=float, required=False, default=0.1)
 

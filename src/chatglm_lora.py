@@ -16,7 +16,6 @@ from torch import nn
 import pytorch_lightning as pl
 from peft import LoraModel, LoraConfig, TaskType
 from transformers import AutoModel, AutoConfig
-from .utils import print_trainable_parameters
 
 
 class ChatGLM(nn.Module):
@@ -36,7 +35,7 @@ class PlChatGLM(pl.LightningModule):
     def __init__(self, config: AutoConfig) -> None:
         super().__init__()
         self.model = ChatGLM(config)
-        print_trainable_parameters(self.model)
+        self.config = config
         self.outputs = []
 
     def loss_fct(self, lm_logits, labels):
