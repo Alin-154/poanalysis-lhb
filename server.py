@@ -32,7 +32,9 @@ if __name__ == "__main__":
     print(config)
 
     model = PoPredictor(config.model_name_or_path, \
-                    config.ptuning_checkpoint, \
-                    config.pre_seq_len,
-                    config.quantize)
+                    config.extra_model_name_or_path, \
+                    model_type=config.model_type, \
+                    inference_mode=config.inference_mode, \
+                    pre_seq_len=config.pre_seq_len, \
+                    quantize=config.quantize)
     app.run(host=config.host, port=config.port)

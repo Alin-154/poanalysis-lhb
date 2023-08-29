@@ -11,9 +11,11 @@
 '''
 import os
 import argparse
+import torch
 import torch.nn as nn
 from tqdm import tqdm
 import jsonlines
+from typing import Dict
 
 
 def read_jsonlines(path):
@@ -100,7 +102,9 @@ def parse_args():
     parser.add_argument("--host", type=str, required=False, default="0.0.0.0")
     parser.add_argument("--port", type=int, required=False, default=6006)
     parser.add_argument("--model_name_or_path", type=str, required=True)
-    parser.add_argument("--ptuning_checkpoint", type=str, required=True)
+    parser.add_argument("--extra_model_name_or_path", type=str, required=False, default="")
+    parser.add_argument("--inference_mode", type=str, required=False, default="origin")
+    parser.add_argument("--model_type", type=str, required=False, default="ft")
     parser.add_argument("--pre_seq_len", type=int, required=True)
     parser.add_argument("--quantize", type=bool, required=False, default=False)
     args = parser.parse_args()

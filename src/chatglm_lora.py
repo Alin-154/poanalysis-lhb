@@ -9,12 +9,12 @@
 @License :    
 @Desc    :   None
 '''
-from typing import Any, Optional
+from typing import Optional
 import torch
 from torch.nn import CrossEntropyLoss
 from torch import nn
 import pytorch_lightning as pl
-from peft import LoraModel, LoraConfig, TaskType
+from peft import PeftModel
 from transformers import AutoModel, AutoConfig
 
 
@@ -23,11 +23,10 @@ class ChatGLM(nn.Module):
         super().__init__()
         self.base_model = AutoModel.from_pretrained(config.model_name_or_path, config=config, trust_remote_code=True)
         if config.use_lora:
-            lora_config = {"default": config.lora_config}
-            self.base_model = LoraModel(self.base_model, lora_config, "default")
+            self.base_model = PeftModel(self.base_model, config.lora_config)
 
     def forward(self, input_ids: Optional[torch.Tensor]):
-        lm_logits = self.base_model(input_ids)
+        lm_logits = self.base_model(input_ids).logits
         return lm_logits
 
 
